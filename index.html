@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<script>
+    const senha = prompt("Digite a senha para acessar o sistema:");
+    if (senha !== "minhasenha123") {
+        alert("Acesso negado!");
+        window.location.href = "https://google.com"; // Redireciona para outro site
+    }
+</script>
+
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Preços - Gráfica</title>
+    <style>
+        /* Estilo Geral */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #333;
+            margin: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color:  #00FFFF;
+            margin-bottom: 20px;
+        }
+
+        /* Formulário */
+        form {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 400px;
+            margin: 0 auto 20px;
+        }
+
+        input, textarea, button {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #f1b2dc;
+        }
+
+        button {
+            background-color: #f1b2dc;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #f1b2dc;
+        }
+
+        /* Tabela */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #f2f2f2;
+        }
+
+        th {
+            background-color: #00FFFF;
+            color: white;
+        }
+
+        td button {
+            background-color: #f1b2dc;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        td button:hover {
+            background-color: #f1b2dc;
+        }
+
+        img {
+            width: 80px;
+            height: auto;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sistema de Preços - Gráfica</h1>
+
+    <input type="text" id="search" placeholder="Pesquise pelo nome do produto" oninput="searchProducts()">
+
+
+    <!-- Formulário -->
+    <form id="productForm">
+        <input type="text" id="name" placeholder="Nome do Produto" required>
+        <textarea id="description" placeholder="Descrição"></textarea>
+        <input type="number" id="price" placeholder="Preço (R$)" step="0.01" required>
+        <input type="file" id="image" accept="image/*" required>
+        <button type="submit">Adicionar Produto</button>
+    </form>
+
+    <!-- Tabela de Produtos -->
+    <table>
+        <thead>
+            <tr>
+                <th>Imagem</th>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Preço</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="productTable">
+            <!-- Produtos Dinâmicos -->
+        </tbody>
+    </table>
+
+    
+    <script>
+        // Elementos
+        const productForm = document.getElementById('productForm');
+        const productTable = document.getElementById('productTable');
+
+        // Produtos Salvos Localmente
+        let products = JSON.parse(localStorage.getItem('products')) || [];
+
+        // Renderizar Produtos
+        function renderProducts() {
+            productTable.innerHTML = ''; // Limpa a tabela
+            products.forEach((product, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><img src="${product.image}" alt="${product.name}"></td>
+                    <td>${product.name}</td>
+                    <td>${product.description}</td>
+                    <td>R$ ${product.price.toFixed(2)}</td>
+                    <td>
+                        <button onclick="editProduct(${index})">Editar</button>
+                        <button onclick="deleteProduct(${index})">Apagar</button>
+                    </td>
+                `;
+                productTable.appendChild(row);
+            });
+        }
+
+        // Adicionar Produto
+        productForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const description = document.getElementById('description').value;
+            const price = parseFloat(document.getElementById('price').value);
+            const imageInput = document.getElementById('image');
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                const product = {
+                    name,
+                    description,
+                    price,
+                    image: event.target.result // Converte a imagem em Base64
+                };
+
+                products.push(product); // Adiciona à lista
+                localStorage.setItem('products', JSON.stringify(products)); // Salva no LocalStorage
+                renderProducts(); // Re-renderiza os produtos
+                productForm.reset();
+            };
+
+            if (imageInput.files[0]) {
+                reader.readAsDataURL(imageInput.files[0]);
+            }
+        });
+
+        // Editar Produto
+        function editProduct(index) {
+            const product = products[index];
+
+            // Preenche o formulário com os valores do produto selecionado
+            document.getElementById('name').value = product.name;
+            document.getElementById('description').value = product.description;
+            document.getElementById('price').value = product.price;
+
+            // Remove o produto antigo e aguarda o usuário salvar o novo
+            deleteProduct(index);
+        }
+
+        // Deletar Produto
+        function deleteProduct(index) {
+            products.splice(index, 1); // Remove o produto
+            localStorage.setItem('products', JSON.stringify(products)); // Atualiza o LocalStorage
+            renderProducts();
+        }
+
+        // Renderiza ao Carregar a Página
+        renderProducts();
+    </script>
+</body>
+</html>

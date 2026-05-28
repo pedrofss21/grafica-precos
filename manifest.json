@@ -1,0 +1,8 @@
+{
+  "name":"Suvira Detail Pro",
+  "short_name":"Suvira",
+  "start_url":"./index.html",
+  "display":"standalone",
+  "background_color":"#020617",
+  "theme_color":"#06b6d4"
+}

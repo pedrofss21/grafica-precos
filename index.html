@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suvira Detail Pro</title>
+
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+
+    <div>
+        <h1>Suvira Detail Pro</h1>
+        <p>Checklist Premium de Higienização</p>
+    </div>
+
+    <div class="status">
+        <span class="dot"></span>
+        Em andamento
+    </div>
+
+</header>
+
+<section class="glass">
+
+    <h2>Veículo</h2>
+
+    <div class="grid">
+
+        <input type="text" placeholder="Marca">
+
+        <input type="text" placeholder="Modelo">
+
+        <input type="text" placeholder="Placa">
+
+        <input type="text" placeholder="Cor">
+
+        <input type="text" placeholder="Responsável">
+
+    </div>
+
+</section>
+
+<section class="glass">
+
+    <h2>Checklist Interno</h2>
+
+    <div class="checklist">
+
+        <label><input type="checkbox"> Bancos</label>
+
+        <label><input type="checkbox"> Portas</label>
+
+        <label><input type="checkbox"> Teto</label>
+
+        <label><input type="checkbox"> Painel</label>
+
+        <label><input type="checkbox"> Porta-copos</label>
+
+        <label><input type="checkbox"> Encosto de braço</label>
+
+        <label><input type="checkbox"> Colunas</label>
+
+        <label><input type="checkbox"> Porta-malas</label>
+
+        <label><input type="checkbox"> Carpete (aspiração)</label>
+
+        <label><input type="checkbox"> Saída ar-condicionado</label>
+
+        <label><input type="checkbox"> Trilho bancos dianteiros</label>
+
+    </div>
+
+</section>
+
+<section class="glass">
+
+    <h2>Observações</h2>
+
+    <textarea placeholder="Escreva observações importantes do veículo..."></textarea>
+
+</section>
+
+<section class="glass">
+
+    <h2>Fotos</h2>
+
+    <div class="upload-area">
+
+        <p>Adicionar fotos antes/depois</p>
+
+        <input type="file" multiple>
+
+    </div>
+
+</section>
+
+<div class="actions">
+
+    <button class="primary" onclick="window.print()">
+        Gerar PDF
+    </button>
+
+    <button class="secondary">
+        Salvar Serviço
+    </button>
+
+</div>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>

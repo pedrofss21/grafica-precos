@@ -1,8 +1,60 @@
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-}
+let imagensBase64 = [];
 
-async function gerarPDF() {
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        const fotosInput =
+        document.getElementById("fotos");
+
+        const preview =
+        document.getElementById("preview");
+
+        fotosInput.addEventListener(
+            "change",
+            function(){
+
+                preview.innerHTML = "";
+
+                imagensBase64 = [];
+
+                const arquivos =
+                this.files;
+
+                for(let i = 0; i < arquivos.length; i++){
+
+                    const leitor =
+                    new FileReader();
+
+                    leitor.onload = function(e){
+
+                        imagensBase64.push(
+                            e.target.result
+                        );
+
+                        const img =
+                        document.createElement("img");
+
+                        img.src =
+                        e.target.result;
+
+                        preview.appendChild(img);
+
+                    };
+
+                    leitor.readAsDataURL(
+                        arquivos[i]
+                    );
+
+                }
+
+            }
+        );
+
+    }
+);
+
+async function gerarPDF(){
 
     const { jsPDF } = window.jspdf;
 
@@ -10,42 +62,25 @@ async function gerarPDF() {
 
     // INPUTS
 
-    const inputs =
-        document.querySelectorAll("input[type='text']");
+    const marca =
+    document.getElementById("marca").value;
 
-    const marca = inputs[0].value;
-    const modelo = inputs[1].value;
-    const placa = inputs[2].value;
-    const cor = inputs[3].value;
-    const responsavel = inputs[4].value;
+    const modelo =
+    document.getElementById("modelo").value;
 
-    // OBSERVAÇÕES
+    const placa =
+    document.getElementById("placa").value;
 
-    const observacoes =
-        document.querySelector("textarea").value;
+    const cor =
+    document.getElementById("cor").value;
 
-    // CHECKLIST
+    const responsavel =
+    document.getElementById("responsavel").value;
 
-    const checkboxes =
-        document.querySelectorAll(
-            'input[type="checkbox"]'
-        );
+    const obs =
+    document.getElementById("obs").value;
 
-    let itens = [];
-
-    checkboxes.forEach((checkbox) => {
-
-        if (checkbox.checked) {
-
-            itens.push(
-                checkbox.parentElement.innerText
-            );
-
-        }
-
-    });
-
-    // FUNDO HEADER
+    // HEADER
 
     doc.setFillColor(6,182,212);
 
@@ -57,8 +92,6 @@ async function gerarPDF() {
         'F'
     );
 
-    // TÍTULO
-
     doc.setTextColor(255,255,255);
 
     doc.setFontSize(24);
@@ -69,8 +102,6 @@ async function gerarPDF() {
         22
     );
 
-    // SUBTÍTULO
-
     doc.setFontSize(11);
 
     doc.text(
@@ -79,13 +110,11 @@ async function gerarPDF() {
         30
     );
 
-    // RESET COR
+    // TEXTO
 
     doc.setTextColor(0,0,0);
 
-    // INFORMAÇÕES
-
-    doc.setFontSize(18);
+    doc.setFontSize(16);
 
     doc.text(
         "Informações do Veículo",
@@ -109,40 +138,40 @@ async function gerarPDF() {
         100
     );
 
-    // LINHA
-
-    doc.setDrawColor(220);
-
-    doc.line(
-        20,
-        108,
-        190,
-        108
-    );
-
     // CHECKLIST
 
-    doc.setFontSize(18);
+    doc.setFontSize(16);
 
     doc.text(
-        "Checklist Interno",
+        "Checklist",
         20,
-        122
+        120
     );
 
-    let y = 135;
+    let y = 132;
 
-    doc.setFontSize(12);
+    document
+    .querySelectorAll(
+        'input[type="checkbox"]'
+    )
+    .forEach((checkbox)=>{
 
-    itens.forEach((item) => {
+        if(checkbox.checked){
 
-        doc.text(
-            `✓ ${item}`,
-            28,
-            y
-        );
+            const texto =
+            checkbox.parentElement.innerText;
 
-        y += 9;
+            doc.setFontSize(12);
+
+            doc.text(
+                `✓ ${texto}`,
+                25,
+                y
+            );
+
+            y += 8;
+
+        }
 
     });
 
@@ -150,7 +179,7 @@ async function gerarPDF() {
 
     y += 10;
 
-    doc.setFontSize(18);
+    doc.setFontSize(16);
 
     doc.text(
         "Observações",
@@ -163,10 +192,10 @@ async function gerarPDF() {
     doc.setFontSize(12);
 
     const linhas =
-        doc.splitTextToSize(
-            observacoes || "Sem observações.",
-            160
-        );
+    doc.splitTextToSize(
+        obs || "Sem observações.",
+        160
+    );
 
     doc.text(
         linhas,
@@ -174,17 +203,59 @@ async function gerarPDF() {
         y
     );
 
-    // RODAPÉ
+    // FOTOS
 
-    doc.setFontSize(10);
+    if(imagensBase64.length > 0){
 
-    doc.setTextColor(120);
+        doc.addPage();
 
-    doc.text(
-        "Gerado por Suvira Detail Pro",
-        20,
-        285
-    );
+        doc.setFontSize(20);
+
+        doc.text(
+            "Fotos do Veículo",
+            20,
+            20
+        );
+
+        let imgY = 35;
+
+        for(let i = 0; i < imagensBase64.length; i++){
+
+            doc.addImage(
+                imagensBase64[i],
+                'JPEG',
+                20,
+                imgY,
+                80,
+                60
+            );
+
+            if(i % 2 === 0){
+
+                doc.addImage(
+                    imagensBase64[i],
+                    'JPEG',
+                    110,
+                    imgY,
+                    80,
+                    60
+                );
+
+            }
+
+            imgY += 70;
+
+            if(imgY > 220 && i < imagensBase64.length - 1){
+
+                doc.addPage();
+
+                imgY = 20;
+
+            }
+
+        }
+
+    }
 
     // SALVAR
 
